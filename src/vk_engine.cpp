@@ -260,41 +260,9 @@ void VulkanEngine::draw_background(VkCommandBuffer cmd, int swapchainImageIndex)
     
     // inefficiently written rgb cycle that doesnt even look that good
     VkClearColorValue clearValue;
-    float r, g, b;
-    int cycle_length = 200;
-    float x = _frameNumber % cycle_length;
-    //r
-    if(x < (cycle_length * (1.0f / 6.0f))) {
-        r = 1;
-    } else if(x < (cycle_length * (1.0f / 3.0f))) {
-        r = get_y_on_line_from_points((cycle_length * (1.0f / 6.0f)), 1.0f, (cycle_length * (1.0f / 3.0f)), 0.0f, x);
-    } else if(x < (cycle_length * (2.0f / 3.0f))) {
-        r = 0;
-    } else if(x < (cycle_length * (5.0f / 6.0f))) {
-        r = get_y_on_line_from_points((cycle_length * (2.0f / 3.0f)), 0.0f, (cycle_length * (5.0f / 6.0f)), 1.0f, x);
-    } else {
-        r = 1;
-    }
-    //g
-    if(x < (cycle_length * (1.0f / 6.0f))) {
-        g = get_y_on_line_from_points(0.0f, 0.0f, (cycle_length * (1.0f / 6.0f)), 1.0f, x);
-    } else if(x < (cycle_length * 0.5f)) {
-        g = 1;
-    } else if(x < (cycle_length * (2.0f / 3.0f))) {
-        g = get_y_on_line_from_points((cycle_length * 0.5f), 1.0f, (cycle_length * (2.0f / 3.0f)), 0.0f, x);
-    } else {
-        g = 0;
-    }
-    //b
-    if(x < (cycle_length * (1.0f / 3.0f))) {
-        b = 0;
-    } else if(x < (cycle_length * 0.5f)) {
-        b = get_y_on_line_from_points((cycle_length * (1.0f / 3.0f)), 0.0f, (cycle_length * 0.5f), 1.0f, x);
-    } else if(x < (cycle_length * (5.0f / 6.0f))) {
-        b = 1;
-    } else {
-        b = get_y_on_line_from_points((cycle_length * (5.0f / 6.0f)), 1.0f, cycle_length, 0.0f, x);
-    }
+    float r = std::abs(std::sin(_frameNumber / 30.f));
+    float g = std::abs(std::sin((_frameNumber + 10) / 40.f));
+    float b = std::abs(std::sin((_frameNumber + 30) / 50.f));
     
     clearValue = { {r, g, b, 1.f} };
     
