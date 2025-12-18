@@ -5,12 +5,29 @@
 
 #include <vk_types.h>
 
+struct DeletionQueue {
+    std::deque<std::function<void()>> deletorFunctions;
+    
+    void push_function(std::function<void()>&& func) {
+        deletorFunctions.push_back(func);
+    }
+    
+    void flush() {
+        for(auto it = deletorFunctions.rbegin(); it != deletorFunctions.rend(); it++) {
+            (*it)();
+        }
+        deletorFunctions.clear();
+    }
+};
+
 struct FrameData {
     VkCommandPool _commandPool;
     VkCommandBuffer _mainCommandBuffer;
     
     VkFence _renderFence;
+    DeletionQueue _deletionQueue;
 };
+
 
 constexpr unsigned int FRAME_OVERLAP = 2;
 
@@ -32,8 +49,13 @@ public:
     VkDevice _device;
     VkSurfaceKHR _surface;
     
+    VmaAllocator _allocator;
+    
     VkSwapchainKHR _swapchain;
     VkFormat _swapchainImageFormat;
+    
+    AllocatedImage _drawImage;
+    VkExtent2D _drawExtent;
     
     FrameData _frames[FRAME_OVERLAP];
     
@@ -49,6 +71,8 @@ public:
     std::vector<VkImage> _swapchainImages;
     std::vector<VkImageView> _swapchainImageViews;
     VkExtent2D _swapchainExtent;
+    
+    DeletionQueue _mainDeletionQueue;
 
 	//initializes everything in the engine
 	void init();
@@ -67,6 +91,8 @@ private:
     void init_swapchain();
     void init_commands();
     void init_sync_structures();
+    
+    void draw_background(VkCommandBuffer cmd, int swapchainImageIndex);
     
     void create_swapchain(uint32_t width, uint32_t height);
     void destroy_swapchain();
