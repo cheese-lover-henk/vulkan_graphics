@@ -1,4 +1,6 @@
 # gitignore
 
 /build/
-*.bat
+build.bat
+buildandrun.bat
+run.bat
